@@ -1,0 +1,18 @@
+## Commands
+List devices using command and find serial port of correct device
+```
+serialport-list
+```
+
+Start application by specifying correct serial port, for example serial-port=COM3 and HTTP port, for example http-port=5002
+```
+npm start --serial-port=COM3 --http-port=5002
+```
+
+## Setting up on Windows
+Download Python 3 https://www.python.org/download/releases/3.0/
+Download VS Build Tools 2017 https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019
+```
+npm install --global node-gyp
+npm config set msvs_version 2017
+```
