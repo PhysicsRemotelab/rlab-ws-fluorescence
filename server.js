@@ -1,36 +1,59 @@
-const { SerialPort } = require('serialport');
+const http = require('http');
+const ws = require('ws');
+const Sensor = require("./Sensor.js");
 
-const CLOCKWISE = '1';
-const COUNTERCLOCKWISE = '2';
-const STOP = '3';
+const httpPort = process.env.npm_config_http_port ?? 3009;
+const serialport = process.env.npm_config_serial_port ?? 'COM4';
 
-class Sensor {
-    init() {
-        this.port = new SerialPort({
-            path: 'COM4', 
-            baudRate: 9600
-        });
-    }
+let server = http.createServer((req, res) => {
+    res.writeHead(200);
+});
+server.listen(httpPort, () => console.log('Started server on', httpPort));
+const wss = new ws.Server({server, path: '/fluorescence'});
 
-    async write(data) {
-        this.port.write(data);
-        this.port.write('\n');
-    }
+wss.on('connection', handleConnection);
+let connections = new Array;
 
-    async delay(ms){
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+const sensor = new Sensor();
+sensor.init(serialport);
+
+function handleConnection(client) {
+    console.log('New connection');
+    connections.push(client);
+
+    client.on('message', (message) => {
+        message = message.toString();
+        console.log(message);
+        handleCommand(message);
+    });
+
+    client.on('error', error => {
+        console.log('Error', error);
+    });
+
+    client.on('close', () => {
+        console.log('Connection closed');
+        let position = connections.indexOf(client);
+        connections.splice(position, 1);
+        if (connections.length === 0) {
+            console.log('No connections');
+        }
+    });
 }
 
-async function main() {
-    const sensor = new Sensor();
-    sensor.init();
-    await sensor.delay(2000);
-    sensor.write(CLOCKWISE);
-    await sensor.delay(2000);
-    sensor.write(COUNTERCLOCKWISE);
-    await sensor.delay(2000);
-    sensor.write(STOP);
+async function handleCommand(message) {
+    message = message.toString();
+    console.log('Message', message);
+    if (message === "1") {
+        console.log('rotateClockwise');
+        await sensor.rotateClockwise();
+    }
+    if (message === "2") {
+        console.log('rotateCounterClockwise');
+        await sensor.rotateCounterClockwise();
+    }
+    if (message === "3") {
+        console.log('stopRotation');
+        await sensor.stopRotation();
+    }
 }
-
-main();
