@@ -44,16 +44,5 @@ function handleConnection(client) {
 async function handleCommand(message) {
     message = message.toString();
     console.log('Message', message);
-    if (message === "1") {
-        console.log('rotateClockwise');
-        await sensor.rotateClockwise();
-    }
-    if (message === "2") {
-        console.log('rotateCounterClockwise');
-        await sensor.rotateCounterClockwise();
-    }
-    if (message === "3") {
-        console.log('stopRotation');
-        await sensor.stopRotation();
-    }
+    await sensor.sendCommand(message);
 }

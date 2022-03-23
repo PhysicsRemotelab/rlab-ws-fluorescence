@@ -8,21 +8,9 @@ class Sensor {
         });
     }
 
-    async rotateClockwise() {
+    async sendCommand(command) {
         await this.delay(100);
-        this.port.write('1');
-        this.port.write('\n');
-    }
-
-    async rotateCounterClockwise() {
-        await this.delay(100);
-        this.port.write('2');
-        this.port.write('\n');
-    }
-
-    async stopRotation() {
-        await this.delay(100);
-        this.port.write('3');
+        this.port.write(command);
         this.port.write('\n');
     }
 
