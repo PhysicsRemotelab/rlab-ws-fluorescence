@@ -1,15 +1,16 @@
 {
   "name": "rlab-ws-fluorescence",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "Fluorescence lab real-time data streaming service",
+  "author": "Toomas Tahves",
+  "license": "GPLV3",
+  "private": true,
+  "engines": {
+    "node": "16.x"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "serialport": "^10.4.0",
     "ws": "^8.5.0"
