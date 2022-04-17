@@ -3,46 +3,83 @@ const ws = require('ws');
 const Sensor = require("./Sensor.js");
 
 const httpPort = process.env.npm_config_http_port ?? 5004;
-const serialport = process.env.npm_config_serial_port ?? 'COM4';
+const serialport = process.env.npm_config_serial_port ?? 'COM3';
 
 let server = http.createServer((req, res) => {
     res.writeHead(200);
 });
 server.listen(httpPort, () => console.log('Started server on', httpPort));
 const wss = new ws.Server({server, path: '/fluorescence'});
-
 wss.on('connection', handleConnection);
 let connections = new Array;
 
-const sensor = new Sensor();
+let sensor = new Sensor();
 sensor.init(serialport);
+sensor.parser.on('data', handleData);
+sensor.port.pause();
+
+let counter = 0;
+let measurement = Array(4095).fill(0);
+let startTime = getCurrentDate();
+
+
+function handleData(buffer) {
+    let numbers = JSON.parse(JSON.stringify(buffer)).data;
+    let result = getResult(numbers);
+    if (result === -1) {
+        console.log('Bad input');
+        return;
+    }
+
+    measurement[result]++;
+    counter++;
+
+    // Broadcast result every 100 counts
+    if(counter % 100 === 0) {
+        broadcast(JSON.stringify(measurement));
+        console.log('Broadcasted data');
+        console.log('Start time: ' + startTime);
+        console.log('Current time: ' + getCurrentDate());
+        console.log('Total counts: ' + counter);
+    }
+}
+
+function getResult(numbers) {
+    let result = -1;
+    // MCA returns total 5 numbers, first three are 77, 67, 65 and last two are measurement result
+    if (numbers[0] === 77 && numbers[1] === 67 && numbers[2] === 65) {
+        result = numbers[3] * 256 + numbers[4];
+    }
+    return result;
+}
+
+function broadcast(data) {
+    for (connection in connections) {
+      connections[connection].send(data);
+    }
+}
 
 function handleConnection(client) {
     console.log('New connection');
+    sensor.resume();
     connections.push(client);
 
-    client.on('message', (message) => {
-        message = message.toString();
-        console.log(message);
-        handleCommand(message);
-    });
-
     client.on('error', error => {
-        console.log('Error', error);
+        console.log(error);
     });
 
     client.on('close', () => {
         console.log('Connection closed');
         let position = connections.indexOf(client);
         connections.splice(position, 1);
-        if (connections.length === 0) {
-            console.log('No connections');
-        }
+        sensor.pause();
+        measurement = Array(4095).fill(0);
     });
 }
 
-async function handleCommand(message) {
-    message = message.toString();
-    console.log('Message', message);
-    await sensor.sendCommand(message);
+function getCurrentDate() {
+    var today = new Date();
+    var date = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+    var time = ('0' + today.getHours()).slice(-2) + ":" + ('0' + today.getMinutes()).slice(-2) + ":" + ('0' + today.getSeconds()).slice(-2);
+    return date + ' ' + time
 }
