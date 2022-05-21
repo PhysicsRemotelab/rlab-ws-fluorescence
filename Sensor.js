@@ -1,21 +1,25 @@
 const { SerialPort } = require('serialport');
+const { ByteLengthParser } = require('@serialport/parser-byte-length');
 
 class Sensor {
-    init(serialport) {
+    init(com) {
         this.port = new SerialPort({
-            path: serialport, 
-            baudRate: 9600
+            path: com,
+            baudRate: 115200
         });
+        this.parser = new ByteLengthParser({ length: 5 });
+        this.port.pipe(this.parser);
+        console.log('Initialized serial port', com);
     }
 
-    async sendCommand(command) {
-        await this.delay(100);
-        this.port.write(command);
-        this.port.write('\n');
+    pause() {
+        this.port.pause();
+        console.log('Port paused');
     }
 
-    async delay(ms){
-        return new Promise(resolve => setTimeout(resolve, ms));
+    resume() {
+        this.port.resume();
+        console.log('Port resumed');
     }
 }
 

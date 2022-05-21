@@ -9,7 +9,7 @@ let server = http.createServer((req, res) => {
     res.writeHead(200);
 });
 server.listen(httpPort, () => console.log('Started server on', httpPort));
-const wss = new ws.Server({server, path: '/fluorescence'});
+const wss = new ws.Server({server, path: '/fluorescence-sensor'});
 wss.on('connection', handleConnection);
 let connections = new Array;
 
@@ -21,7 +21,6 @@ sensor.port.pause();
 let counter = 0;
 let measurement = Array(4095).fill(0);
 let startTime = getCurrentDate();
-
 
 function handleData(buffer) {
     let numbers = JSON.parse(JSON.stringify(buffer)).data;
