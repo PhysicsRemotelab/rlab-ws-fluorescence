@@ -24,7 +24,9 @@ let startTime = getCurrentDate();
 
 function handleData(buffer) {
     let numbers = JSON.parse(JSON.stringify(buffer)).data;
+    console.log(numbers);
     let result = getResult(numbers);
+    console.log(result);
     if (result === -1) {
         console.log('Bad input');
         return;
@@ -34,7 +36,7 @@ function handleData(buffer) {
     counter++;
 
     // Broadcast result every 100 counts
-    if(counter % 100 === 0) {
+    if(counter % 10 === 0) {
         broadcast(JSON.stringify(measurement));
         console.log('Broadcasted data');
         console.log('Start time: ' + startTime);
@@ -47,6 +49,18 @@ function getResult(numbers) {
     let result = -1;
     // MCA returns total 5 numbers, first three are 77, 67, 65 and last two are measurement result
     if (numbers[0] === 77 && numbers[1] === 67 && numbers[2] === 65) {
+        result = numbers[3] * 256 + numbers[4];
+    }
+    if (numbers[1] === 77 && numbers[2] === 67 && numbers[3] === 65) {
+        result = numbers[3] * 256 + numbers[4];
+    }
+    if (numbers[2] === 77 && numbers[3] === 67 && numbers[4] === 65) {
+        result = numbers[3] * 256 + numbers[4];
+    }
+    if (numbers[3] === 77 && numbers[4] === 67 && numbers[0] === 65) {
+        result = numbers[3] * 256 + numbers[4];
+    }
+    if (numbers[4] === 77 && numbers[0] === 67 && numbers[1] === 65) {
         result = numbers[3] * 256 + numbers[4];
     }
     return result;
