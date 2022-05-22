@@ -26,7 +26,6 @@ function handleData(buffer) {
     let numbers = JSON.parse(JSON.stringify(buffer)).data;
     let result = getResult(numbers);
     if (result === -1) {
-        console.log('Bad input');
         return;
     }
 
@@ -60,6 +59,9 @@ function getResult(numbers) {
     }
     if (numbers[4] === 77 && numbers[0] === 67 && numbers[1] === 65) {
         result = numbers[3] * 256 + numbers[4];
+    }
+    if (result > 4095) {
+        result = -1;
     }
     return result;
 }
