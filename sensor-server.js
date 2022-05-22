@@ -36,7 +36,7 @@ function handleData(buffer) {
     counter++;
 
     // Broadcast result every 100 counts
-    if(counter % 10 === 0) {
+    if(counter % 100 === 0) {
         broadcast(JSON.stringify(measurement));
         console.log('Broadcasted data');
         console.log('Start time: ' + startTime);
