@@ -24,9 +24,7 @@ let startTime = getCurrentDate();
 
 function handleData(buffer) {
     let numbers = JSON.parse(JSON.stringify(buffer)).data;
-    console.log(numbers);
     let result = getResult(numbers);
-    console.log(result);
     if (result === -1) {
         console.log('Bad input');
         return;
@@ -87,6 +85,7 @@ function handleConnection(client) {
         connections.splice(position, 1);
         sensor.pause();
         measurement = Array(4095).fill(0);
+        counter = 0;
     });
 }
 
