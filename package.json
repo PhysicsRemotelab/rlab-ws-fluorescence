@@ -9,8 +9,8 @@
     "node": "16.x"
   },
   "scripts": {
-    "start-sensor": "node sensor-server.js",
-    "start-commands": "node command-server.js"
+    "server-sensor": "node sensor-server.js",
+    "server-commands": "node command-server.js"
   },
   "dependencies": {
     "serialport": "^10.4.0",
