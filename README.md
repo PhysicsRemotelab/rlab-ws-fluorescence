@@ -12,7 +12,7 @@ npm start --serial-port=COM3
 
 Start application by specifying correct serial port, for example:
 ```
-npm run server-sensor --serial-port=/dev/ttyUSB1
+npm run server-sensor --serial-port=/dev/ttyUSB3
 npm run server-commands --serial-port=/dev/ttyUSB0
 ```
 
